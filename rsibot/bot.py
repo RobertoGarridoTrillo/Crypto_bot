@@ -1,13 +1,16 @@
+import pprint
 import websocket
+import json
 from binance import Client
+from binance.enums import *
+import numpy
+import talib
 from app import config
-
 
 SOCKET = "wss://stream.binance.com:9443/ws/ethusdt@kline_1m"
 
 client = Client(config.API_KEY, config.API_SECRET)
 
-"""
 RSI_PERIOD = 14
 RSI_OVERBOUGHT = 70
 RSI_OVERSOLD = 30
@@ -16,22 +19,19 @@ TRADE_QUANTITY = 0.05
 
 closes = []
 in_position = False
-"""
 
 
-# def order(side, quantity, symbol, order_type=ORDER_TYPE_MARKET):
-def order():
-    """
-try:
-    print("sending order")
-            order = client.create_order(symbol=symbol, side=side, type=order_type, quantity=quantity)
-            print(order)
-        except Exception as e:
-            print("an exception occured - {}".format(e))
-            return False
+def order(side, quantity, symbol, order_type=ORDER_TYPE_MARKET):
+    try:
+        print("sending order")
+        order = client.create_order(symbol=symbol, side=side, type=order_type, quantity=quantity)
+        print(order)
+    except Exception as e:
+        print("an exception occurred - {}".format(e))
+        return False
 
-return True
-            """
+
+    return True
 
 
 def on_open(ws):
@@ -44,11 +44,10 @@ def on_close(ws):
 
 def on_message(ws, message):
     print('received message')
-    """
     global closes, in_position
 
     json_message = json.loads(message)
-    pprint.pprint(json_message)
+    # pprint.pprint(json_message)
 
     candle = json_message['k']
 
@@ -60,7 +59,6 @@ def on_message(ws, message):
         closes.append(float(close))
         print("closes")
         print(closes)
-
         if len(closes) > RSI_PERIOD:
             np_closes = numpy.array(closes)
             rsi = talib.RSI(np_closes, RSI_PERIOD)
@@ -88,14 +86,12 @@ def on_message(ws, message):
                     order_succeeded = order(SIDE_BUY, TRADE_QUANTITY, TRADE_SYMBOL)
                     if order_succeeded:
                         in_position = True
-    """
 
 
 try:
-    websocket.enableTrace(True)
-    ws = websocket.WebSocketApp(SOCKET, on_open=on_open,
-        on_close=on_close, on_message=on_message)
+    # websocket.enableTrace(True)
+    ws = websocket.WebSocketApp(SOCKET, on_open=on_open, on_close=on_close, on_message=on_message)
     ws.run_forever()
 except Exception as e:
-    print(str(e))
-
+    """print(str(e))
+"""
