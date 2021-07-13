@@ -3,3 +3,4 @@ TA-Lib
 numpy
 backtrader
 flask
+websocket-client
